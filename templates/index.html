@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5f6fa;
+            --text-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f1c40f;
+            --danger-color: #e74c3c;
+            --neutral-color: #95a5a6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: var(--neutral-color);
+            font-size: 1.1em;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            min-height: 150px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .analyze-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .analyze-btn:hover {
+            background-color: #357abd;
+            transform: translateY(-2px);
+        }
+
+        .clear-btn {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        .clear-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-section {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background: var(--secondary-color);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sentiment-score {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .star-rating {
+            font-size: 32px;
+            margin: 15px 0;
+            color: #f1c40f;
+        }
+
+        .sentiment-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .prediction-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .prediction-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .error {
+            display: none;
+            background-color: #fde8e8;
+            color: var(--danger-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .sentiment-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sentiment Analysis Dashboard</h1>
+            <p>Analyze the sentiment of your text using advanced machine learning models</p>
+        </div>
+
+        <div class="input-section">
+            <textarea id="reviewText" placeholder="Enter your text here for sentiment analysis..."></textarea>
+            <div class="button-group">
+                <button class="analyze-btn" onclick="analyzeSentiment()">
+                    <span class="icon">📊</span>
+                    Analyze Sentiment
+                </button>
+                <button class="clear-btn" onclick="clearText()">
+                    <span class="icon">🗑️</span>
+                    Clear Text
+                </button>
+            </div>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="loading-spinner"></div>
+            <p>Analyzing sentiment...</p>
+        </div>
+
+        <div id="error" class="error"></div>
+
+        <div id="result" class="result-section">
+            <div class="sentiment-score">
+                <h2>Analysis Result</h2>
+                <div class="star-rating" id="starRating"></div>
+                <h3 id="sentimentText"></h3>
+            </div>
+
+            <div class="sentiment-details">
+                <div class="prediction-card">
+                    <h3>Random Forest</h3>
+                    <div class="score" id="rfPrediction"></div>
+                </div>
+                <div class="prediction-card">
+                    <h3>XGBoost</h3>
+                    <div class="score" id="xgbPrediction"></div>
+                </div>
+                <div class="prediction-card">
+                    <h3>Voting Classifier</h3>
+                    <div class="score" id="votingPrediction"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function clearText() {
+            document.getElementById('reviewText').value = '';
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+        }
+
+        function analyzeSentiment() {
+            const reviewText = document.getElementById('reviewText').value;
+            const loadingDiv = document.getElementById('loading');
+            const resultDiv = document.getElementById('result');
+            const errorDiv = document.getElementById('error');
+
+            if (!reviewText.trim()) {
+                errorDiv.textContent = 'Please enter some text to analyze';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            errorDiv.style.display = 'none';
+            resultDiv.style.display = 'none';
+            loadingDiv.style.display = 'block';
+
+            fetch('/analyze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ review: reviewText })
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadingDiv.style.display = 'none';
+                
+                if (data.error) {
+                    errorDiv.textContent = data.error;
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+
+                document.getElementById('sentimentText').textContent = getSentimentText(data.sentiment);
+                document.getElementById('rfPrediction').textContent = `${data.all_predictions.random_forest}/5`;
+                document.getElementById('xgbPrediction').textContent = `${data.all_predictions.xgboost}/5`;
+                document.getElementById('votingPrediction').textContent = `${data.all_predictions.voting_classifier}/5`;
+
+                const starRating = document.getElementById('starRating');
+                starRating.textContent = '★'.repeat(Math.round(data.rating)) + '☆'.repeat(5 - Math.round(data.rating));
+
+                resultDiv.style.display = 'block';
+            })
+            .catch(error => {
+                loadingDiv.style.display = 'none';
+                errorDiv.textContent = 'An error occurred during analysis';
+                errorDiv.style.display = 'block';
+                console.error('Error:', error);
+            });
+        }
+
+        function getSentimentText(sentiment) {
+            const sentiments = {
+                'very_negative': 'Very Negative 😠',
+                'negative': 'Negative 😟',
+                'neutral': 'Neutral 😐',
+                'positive': 'Positive 😊',
+                'very_positive': 'Very Positive 😄'
+            };
+            return sentiments[sentiment] || sentiment;
+        }
+    </script>
+</body>
+</html>
