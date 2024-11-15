@@ -1,6 +1,6 @@
-# 🎭 Sentiment Analysis Dashboard
+# 🎭 Review Sentiment Analysis
 
-> An elegant web-based tool that analyzes the emotional tone of text using advanced ML models.
+> Web-based dashboard for analyzing and classifying customer reviews using ML models.
 
 <div align="center">
   <img src="./assets/Dashboard%20Preview%201.png" alt="Dashboard Preview 1" width="800"/>
