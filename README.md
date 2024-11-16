@@ -26,17 +26,11 @@ pandas~=2.1.0
 numpy~=1.24.3
 matplotlib~=3.7.2
 seaborn~=0.12.2
-
-# NLP & ML
 nltk~=3.8.1
 gensim~=4.3.1
 scikit-learn~=1.3.0
 xgboost~=2.0.0
-
-# Web Framework
 flask~=2.3.3
-
-# Configuration
 pyyaml~=6.0.1
 ```
 ### 🚀 Installation
