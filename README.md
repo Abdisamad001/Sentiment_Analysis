@@ -21,7 +21,6 @@
 ## 📦 Requirements
 
 ```txt
-# Core Data Science
 pandas~=2.1.0
 numpy~=1.24.3
 matplotlib~=3.7.2
